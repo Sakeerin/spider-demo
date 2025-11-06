@@ -54,11 +54,70 @@ enum ServiceType {
   EV_CHARGER
 }
 
+enum UrgencyLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum NotificationChannel {
+  EMAIL
+  SMS
+  LINE
+  IN_APP
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  DELIVERED
+  FAILED
+}
+
+enum ProductCategory {
+  SOLAR
+  EV_CHARGER
+  SMART_DEVICE
+}
+
+enum Province {
+  BANGKOK
+  NONTHABURI
+  PATHUM_THANI
+  SAMUT_PRAKAN
+  SAMUT_SAKHON
+  NAKHON_PATHOM
+  CHONBURI
+  RAYONG
+  CHACHOENGSAO
+  PRACHIN_BURI
+  NAKHON_NAYOK
+  SA_KAEO
+  AYUTTHAYA
+  LOPBURI
+  SARABURI
+  SING_BURI
+  ANG_THONG
+  SUPHAN_BURI
+  KANCHANABURI
+  RATCHABURI
+  SAMUT_SONGKHRAM
+  PHETCHABURI
+  PRACHUAP_KHIRI_KHAN
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
   phone     String?
   role      UserRole @default(CUSTOMER)
+  isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -69,49 +128,169 @@ model User {
   language  String  @default("en")
 
   // Relations
-  contractor Contractor?
-  leads      Lead[]
-  jobs       Job[]      @relation("CustomerJobs")
-  reviews    Review[]
+  profile       UserProfile?
+  contractor    Contractor?
+  leads         Lead[]
+  customerJobs  Job[]           @relation("CustomerJobs")
+  reviews       Review[]
+  notifications Notification[]
+  auditLogs     AuditLog[]
 
   @@map("users")
 }
 
-model Contractor {
-  id           String        @id @default(cuid())
-  userId       String        @unique
-  businessName String
-  services     ServiceType[]
-  experience   Int           @default(0)
-  isApproved   Boolean       @default(false)
-  isActive     Boolean       @default(true)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+model UserProfile {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  // Notification preferences
+  emailNotifications Boolean @default(true)
+  smsNotifications   Boolean @default(false)
+  lineNotifications  Boolean @default(true)
+  inAppNotifications Boolean @default(true)
+
+  // Additional profile data
+  address    String?
+  city       String?
+  province   Province?
+  postalCode String?
+  timezone   String   @default("Asia/Bangkok")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  jobs Job[] @relation("ContractorJobs")
+
+  @@map("user_profiles")
+}
+
+model Contractor {
+  id           String             @id @default(cuid())
+  userId       String             @unique
+  businessName String
+  services     ServiceType[]
+  serviceAreas Province[]
+  experience   Int                @default(0)
+  verification VerificationStatus @default(PENDING)
+  isApproved   Boolean            @default(false)
+  isActive     Boolean            @default(true)
+  
+  // Business information
+  description     String?
+  website         String?
+  businessLicense String?
+  
+  // Ratings and performance
+  averageRating Float   @default(0)
+  totalReviews  Int     @default(0)
+  successRate   Float   @default(0)
+  responseTime  Int     @default(0) // in minutes
+  
+  // Availability settings
+  isAvailable        Boolean @default(true)
+  maxConcurrentJobs  Int     @default(3)
+  prefersCatalogJobs Boolean @default(false)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contractorJobs  Job[]             @relation("ContractorJobs")
+  portfolio       PortfolioItem[]
+  leadAssignments LeadAssignment[]
+  availability    Availability[]
 
   @@map("contractors")
 }
 
+model PortfolioItem {
+  id           String   @id @default(cuid())
+  contractorId String
+  title        String
+  description  String?
+  images       String[] // Array of image URLs
+  serviceType  ServiceType
+  completedAt  DateTime?
+  isPublic     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  contractor Contractor @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+
+  @@map("portfolio_items")
+}
+
+model Availability {
+  id           String   @id @default(cuid())
+  contractorId String
+  dayOfWeek    Int      // 0 = Sunday, 1 = Monday, etc.
+  startTime    String   // HH:MM format
+  endTime      String   // HH:MM format
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  contractor Contractor @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+
+  @@map("availability")
+}
+
 model Lead {
-  id          String     @id @default(cuid())
+  id          String       @id @default(cuid())
   customerId  String
   serviceType ServiceType
   description String
-  location    String
-  budget      String
-  urgency     String     @default("medium")
-  status      LeadStatus @default(PENDING)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  urgency     UrgencyLevel @default(MEDIUM)
+  status      LeadStatus   @default(PENDING)
+  
+  // Location information
+  address    String
+  city       String
+  province   Province
+  postalCode String?
+  
+  // Budget information
+  budgetMin Float?
+  budgetMax Float?
+  
+  // Contact preferences
+  preferredContactTime String?
+  notes                String?
+  
+  // Lead source tracking
+  source     String? // website, referral, marketing, etc.
+  campaign   String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  customer User  @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  jobs     Job[]
+  customer        User             @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  jobs            Job[]
+  leadAssignments LeadAssignment[]
 
   @@map("leads")
+}
+
+model LeadAssignment {
+  id           String   @id @default(cuid())
+  leadId       String
+  contractorId String
+  assignedAt   DateTime @default(now())
+  respondedAt  DateTime?
+  response     String? // ACCEPTED, DECLINED, NO_RESPONSE
+  declineReason String?
+  
+  // Relations
+  lead       Lead       @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  contractor Contractor @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+
+  @@unique([leadId, contractorId])
+  @@map("lead_assignments")
 }
 
 model Job {
@@ -120,8 +299,22 @@ model Job {
   contractorId String
   customerId   String
   status       JobStatus @default(PENDING)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  
+  // Job details
+  title       String
+  description String
+  totalAmount Float?
+  startDate   DateTime?
+  endDate     DateTime?
+  
+  // Quote information
+  quoteAmount      Float?
+  quotedAt         DateTime?
+  quoteApprovedAt  DateTime?
+  quoteDocument    String? // URL to quote document
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
   lead       Lead        @relation(fields: [leadId], references: [id], onDelete: Cascade)
@@ -129,8 +322,27 @@ model Job {
   customer   User        @relation("CustomerJobs", fields: [customerId], references: [id], onDelete: Cascade)
   milestones Milestone[]
   reviews    Review[]
+  documents  Document[]
 
   @@map("jobs")
+}
+
+model Document {
+  id       String @id @default(cuid())
+  jobId    String
+  filename String
+  url      String
+  fileType String
+  fileSize Int
+  
+  uploadedBy String // User ID who uploaded
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@map("documents")
 }
 
 model Milestone {
@@ -153,16 +365,133 @@ model Milestone {
 
 model Review {
   id         String   @id @default(cuid())
-  jobId      String
+  jobId      String   @unique
   customerId String
-  rating     Int
+  rating     Int      // 1-5 stars
   comment    String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  
+  // Review categories
+  qualityRating      Int? // 1-5 stars
+  timelinessRating   Int? // 1-5 stars
+  communicationRating Int? // 1-5 stars
+  valueRating        Int? // 1-5 stars
+  
+  // Moderation
+  isApproved Boolean  @default(false)
+  moderatedAt DateTime?
+  moderatedBy String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
   job      Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
   customer User @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
   @@map("reviews")
+}
+
+model Notification {
+  id        String              @id @default(cuid())
+  userId    String
+  channel   NotificationChannel
+  status    NotificationStatus  @default(PENDING)
+  
+  // Content
+  title     String
+  message   String
+  data      Json? // Additional data for the notification
+  
+  // Delivery tracking
+  sentAt      DateTime?
+  deliveredAt DateTime?
+  readAt      DateTime?
+  
+  // Retry logic
+  retryCount Int @default(0)
+  maxRetries Int @default(3)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model Product {
+  id          String          @id @default(cuid())
+  category    ProductCategory
+  name        String
+  description String
+  
+  // Product details
+  specifications Json
+  images         String[]
+  priceMin       Float?
+  priceMax       Float?
+  
+  // SEO and content
+  slug        String  @unique
+  metaTitle   String?
+  metaDescription String?
+  
+  // Status
+  isActive    Boolean @default(true)
+  isFeatured  Boolean @default(false)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("products")
+}
+
+model Promotion {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  image       String?
+  
+  // Promotion details
+  serviceTypes ServiceType[]
+  discountType String? // PERCENTAGE, FIXED_AMOUNT
+  discountValue Float?
+  
+  // Validity
+  validFrom DateTime
+  validTo   DateTime
+  isActive  Boolean  @default(true)
+  
+  // Display settings
+  isFeatured Boolean @default(false)
+  priority   Int     @default(0)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("promotions")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String   // CREATE, UPDATE, DELETE, etc.
+  resource  String   // jobs, milestones, users, etc.
+  resourceId String
+  
+  // Change tracking
+  oldValues Json?
+  newValues Json?
+  
+  // Context
+  ipAddress String?
+  userAgent String?
+  
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("audit_logs")
 }

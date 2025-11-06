@@ -7,7 +7,7 @@
   - Set up basic CI/CD pipeline with GitHub Actions for testing and linting
   - _Requirements: 9.1, 9.3, 10.1_
 
-- [ ] 2. Implement core data models and database schema
+- [x] 2. Implement core data models and database schema
   - Create Prisma schema with all core entities (User, Contractor, Lead, Job, Milestone, etc.)
   - Implement database migrations and seed data for development
   - Create TypeScript interfaces and types matching the data models

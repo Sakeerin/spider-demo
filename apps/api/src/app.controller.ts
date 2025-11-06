@@ -14,12 +14,8 @@ export class AppController {
   }
 
   @Get('health')
-  @ApiOperation({ summary: 'Application health status' })
-  getHealth() {
-    return {
-      status: 'ok',
-      timestamp: new Date().toISOString(),
-      service: 'SPIDER Marketplace API',
-    };
+  @ApiOperation({ summary: 'Application health status with database check' })
+  async getHealth() {
+    return this.appService.getHealth();
   }
 }

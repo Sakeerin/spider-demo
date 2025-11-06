@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { DatabaseExceptionFilter } from './common/filters/database-exception.filter';
+import { DatabaseErrorInterceptor } from './common/interceptors/database-error.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -20,6 +22,10 @@ async function bootstrap() {
       transform: true,
     })
   );
+
+  // Global error handling
+  app.useGlobalFilters(new DatabaseExceptionFilter());
+  app.useGlobalInterceptors(new DatabaseErrorInterceptor());
 
   // Swagger documentation
   const config = new DocumentBuilder()
