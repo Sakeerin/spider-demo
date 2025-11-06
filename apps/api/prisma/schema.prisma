@@ -115,6 +115,7 @@ enum Province {
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
+  password  String?  // Optional for magic link authentication
   phone     String?
   role      UserRole @default(CUSTOMER)
   isActive  Boolean  @default(true)
