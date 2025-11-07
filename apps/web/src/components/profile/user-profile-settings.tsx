@@ -16,10 +16,22 @@ export function UserProfileSettings(props: UserProfileSettingsProps) {
   const [success, setSuccess] = useState(false);
 
   const defaultValues = {
-    emailNotifications: profile?.emailNotifications !== undefined ? profile.emailNotifications : true,
-    smsNotifications: profile?.smsNotifications !== undefined ? profile.smsNotifications : false,
-    lineNotifications: profile?.lineNotifications !== undefined ? profile.lineNotifications : true,
-    inAppNotifications: profile?.inAppNotifications !== undefined ? profile.inAppNotifications : true,
+    emailNotifications:
+      profile?.emailNotifications !== undefined
+        ? profile.emailNotifications
+        : true,
+    smsNotifications:
+      profile?.smsNotifications !== undefined
+        ? profile.smsNotifications
+        : false,
+    lineNotifications:
+      profile?.lineNotifications !== undefined
+        ? profile.lineNotifications
+        : true,
+    inAppNotifications:
+      profile?.inAppNotifications !== undefined
+        ? profile.inAppNotifications
+        : true,
     address: profile?.address || '',
     city: profile?.city || '',
     province: profile?.province || undefined,
@@ -109,7 +121,10 @@ export function UserProfileSettings(props: UserProfileSettingsProps) {
 
         <div className="space-y-4">
           <div>
-            <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="address"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Address
             </label>
             <input
@@ -122,7 +137,10 @@ export function UserProfileSettings(props: UserProfileSettingsProps) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="city"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 City
               </label>
               <input
@@ -134,7 +152,10 @@ export function UserProfileSettings(props: UserProfileSettingsProps) {
             </div>
 
             <div>
-              <label htmlFor="province" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="province"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Province
               </label>
               <select
@@ -152,7 +173,10 @@ export function UserProfileSettings(props: UserProfileSettingsProps) {
             </div>
 
             <div>
-              <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="postalCode"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Postal Code
               </label>
               <input
@@ -164,7 +188,10 @@ export function UserProfileSettings(props: UserProfileSettingsProps) {
             </div>
 
             <div>
-              <label htmlFor="timezone" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="timezone"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Timezone
               </label>
               <select

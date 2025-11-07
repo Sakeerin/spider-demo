@@ -61,7 +61,10 @@ export function UserProfileForm({ user, onSubmit }: UserProfileFormProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="firstName"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               First Name
             </label>
             <input
@@ -73,7 +76,10 @@ export function UserProfileForm({ user, onSubmit }: UserProfileFormProps) {
           </div>
 
           <div>
-            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="lastName"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Last Name
             </label>
             <input
@@ -85,7 +91,10 @@ export function UserProfileForm({ user, onSubmit }: UserProfileFormProps) {
           </div>
 
           <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="phone"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Phone Number
             </label>
             <input
@@ -97,7 +106,10 @@ export function UserProfileForm({ user, onSubmit }: UserProfileFormProps) {
           </div>
 
           <div>
-            <label htmlFor="language" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="language"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Language
             </label>
             <select

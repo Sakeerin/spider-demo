@@ -94,7 +94,10 @@ export default function CustomerProfilePage() {
         )}
 
         {activeTab === 'settings' && (
-          <UserProfileSettings profile={userData.profile} onSubmit={handleUpdateSettings} />
+          <UserProfileSettings
+            profile={userData.profile}
+            onSubmit={handleUpdateSettings}
+          />
         )}
       </div>
     </div>

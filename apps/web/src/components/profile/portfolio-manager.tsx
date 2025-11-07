@@ -3,7 +3,11 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { ServiceType } from '@spider/shared/types/common';
-import { IPortfolioItem, CreatePortfolioItemDto, UpdatePortfolioItemDto } from '@spider/shared/types/contractor';
+import {
+  IPortfolioItem,
+  CreatePortfolioItemDto,
+  UpdatePortfolioItemDto,
+} from '@spider/shared/types/contractor';
 
 interface PortfolioManagerProps {
   portfolio: IPortfolioItem[];
@@ -12,7 +16,12 @@ interface PortfolioManagerProps {
   onDelete: (id: string) => Promise<void>;
 }
 
-export function PortfolioManager({ portfolio, onAdd, onUpdate, onDelete }: PortfolioManagerProps) {
+export function PortfolioManager({
+  portfolio,
+  onAdd,
+  onUpdate,
+  onDelete,
+}: PortfolioManagerProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -38,7 +47,8 @@ export function PortfolioManager({ portfolio, onAdd, onUpdate, onDelete }: Portf
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this portfolio item?')) return;
+    if (!confirm('Are you sure you want to delete this portfolio item?'))
+      return;
 
     setIsLoading(true);
     try {
@@ -63,10 +73,16 @@ export function PortfolioManager({ portfolio, onAdd, onUpdate, onDelete }: Portf
       </div>
 
       {isAdding && (
-        <form onSubmit={handleSubmit(handleAdd)} className="mb-6 p-4 border border-gray-300 rounded-md">
+        <form
+          onSubmit={handleSubmit(handleAdd)}
+          className="mb-6 p-4 border border-gray-300 rounded-md"
+        >
           <div className="space-y-4">
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Title <span className="text-red-500">*</span>
               </label>
               <input
@@ -76,12 +92,17 @@ export function PortfolioManager({ portfolio, onAdd, onUpdate, onDelete }: Portf
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {errors.title && (
-                <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.title.message}
+                </p>
               )}
             </div>
 
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Description
               </label>
               <textarea
@@ -93,12 +114,17 @@ export function PortfolioManager({ portfolio, onAdd, onUpdate, onDelete }: Portf
             </div>
 
             <div>
-              <label htmlFor="serviceType" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="serviceType"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Service Type <span className="text-red-500">*</span>
               </label>
               <select
                 id="serviceType"
-                {...register('serviceType', { required: 'Service type is required' })}
+                {...register('serviceType', {
+                  required: 'Service type is required',
+                })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select service type</option>
@@ -109,31 +135,43 @@ export function PortfolioManager({ portfolio, onAdd, onUpdate, onDelete }: Portf
                 ))}
               </select>
               {errors.serviceType && (
-                <p className="mt-1 text-sm text-red-600">{errors.serviceType.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.serviceType.message}
+                </p>
               )}
             </div>
 
             <div>
-              <label htmlFor="images" className="block text-sm font-medium text-gray-700 mb-1">
-                Image URLs (comma-separated) <span className="text-red-500">*</span>
+              <label
+                htmlFor="images"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Image URLs (comma-separated){' '}
+                <span className="text-red-500">*</span>
               </label>
               <input
                 id="images"
                 type="text"
                 {...register('images', {
                   required: 'At least one image is required',
-                  setValueAs: (value) => value.split(',').map((url: string) => url.trim()),
+                  setValueAs: (value) =>
+                    value.split(',').map((url: string) => url.trim()),
                 })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
               />
               {errors.images && (
-                <p className="mt-1 text-sm text-red-600">{errors.images.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.images.message}
+                </p>
               )}
             </div>
 
             <div>
-              <label htmlFor="completedAt" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="completedAt"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Completion Date
               </label>
               <input
@@ -151,7 +189,9 @@ export function PortfolioManager({ portfolio, onAdd, onUpdate, onDelete }: Portf
                 defaultChecked={true}
                 className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
-              <span className="text-sm text-gray-700">Make this item public</span>
+              <span className="text-sm text-gray-700">
+                Make this item public
+              </span>
             </label>
           </div>
 
@@ -169,7 +209,10 @@ export function PortfolioManager({ portfolio, onAdd, onUpdate, onDelete }: Portf
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {portfolio.map((item) => (
-          <div key={item.id} className="border border-gray-300 rounded-md overflow-hidden">
+          <div
+            key={item.id}
+            className="border border-gray-300 rounded-md overflow-hidden"
+          >
             {item.images.length > 0 && (
               <img
                 src={item.images[0]}
@@ -179,7 +222,9 @@ export function PortfolioManager({ portfolio, onAdd, onUpdate, onDelete }: Portf
             )}
             <div className="p-4">
               <h3 className="font-semibold text-lg mb-1">{item.title}</h3>
-              <p className="text-sm text-gray-600 mb-2">{item.serviceType.replace(/_/g, ' ')}</p>
+              <p className="text-sm text-gray-600 mb-2">
+                {item.serviceType.replace(/_/g, ' ')}
+              </p>
               {item.description && (
                 <p className="text-sm text-gray-700 mb-3">{item.description}</p>
               )}

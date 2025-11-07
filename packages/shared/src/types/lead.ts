@@ -32,10 +32,28 @@ export interface ILeadAssignment {
   respondedAt?: Date;
   response?: string; // ACCEPTED, DECLINED, NO_RESPONSE
   declineReason?: string;
+  contractor?: {
+    id: string;
+    businessName: string;
+    averageRating: number;
+    services?: string[];
+  };
 }
 
 export interface ILeadWithAssignments extends ILead {
   leadAssignments: ILeadAssignment[];
+  customer?: {
+    id: string;
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+  };
+  jobs?: Array<{
+    id: string;
+    status: string;
+    title: string;
+  }>;
 }
 
 // Lead creation and update DTOs

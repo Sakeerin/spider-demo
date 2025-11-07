@@ -4,7 +4,10 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { ServiceType } from '@spider/shared/types/common';
 import { Province } from '@spider/shared/types/user';
-import { CreateContractorDto, UpdateContractorDto } from '@spider/shared/types/contractor';
+import {
+  CreateContractorDto,
+  UpdateContractorDto,
+} from '@spider/shared/types/contractor';
 
 interface ContractorProfileFormProps {
   contractor?: any;
@@ -26,9 +29,13 @@ export function ContractorProfileForm(props: ContractorProfileFormProps) {
     description: contractor?.description || '',
     website: contractor?.website || '',
     businessLicense: contractor?.businessLicense || '',
-    isAvailable: contractor?.isAvailable !== undefined ? contractor.isAvailable : true,
+    isAvailable:
+      contractor?.isAvailable !== undefined ? contractor.isAvailable : true,
     maxConcurrentJobs: contractor?.maxConcurrentJobs || 3,
-    prefersCatalogJobs: contractor?.prefersCatalogJobs !== undefined ? contractor.prefersCatalogJobs : false,
+    prefersCatalogJobs:
+      contractor?.prefersCatalogJobs !== undefined
+        ? contractor.prefersCatalogJobs
+        : false,
   };
 
   const {
@@ -65,28 +72,40 @@ export function ContractorProfileForm(props: ContractorProfileFormProps) {
 
         {success && (
           <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded">
-            {isCreate ? 'Contractor profile created successfully!' : 'Profile updated successfully!'}
+            {isCreate
+              ? 'Contractor profile created successfully!'
+              : 'Profile updated successfully!'}
           </div>
         )}
 
         <div className="space-y-4">
           <div>
-            <label htmlFor="businessName" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="businessName"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Business Name <span className="text-red-500">*</span>
             </label>
             <input
               id="businessName"
               type="text"
-              {...register('businessName', { required: 'Business name is required' })}
+              {...register('businessName', {
+                required: 'Business name is required',
+              })}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {errors.businessName && (
-              <p className="mt-1 text-sm text-red-600">{String(errors.businessName.message)}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {String(errors.businessName.message)}
+              </p>
             )}
           </div>
 
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="description"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Description
             </label>
             <textarea
@@ -100,23 +119,34 @@ export function ContractorProfileForm(props: ContractorProfileFormProps) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="experience" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="experience"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Years of Experience <span className="text-red-500">*</span>
               </label>
               <input
                 id="experience"
                 type="number"
                 min="0"
-                {...register('experience', { required: 'Experience is required', min: 0 })}
+                {...register('experience', {
+                  required: 'Experience is required',
+                  min: 0,
+                })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {errors.experience && (
-                <p className="mt-1 text-sm text-red-600">{String(errors.experience.message)}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {String(errors.experience.message)}
+                </p>
               )}
             </div>
 
             <div>
-              <label htmlFor="website" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="website"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Website
               </label>
               <input
@@ -130,7 +160,10 @@ export function ContractorProfileForm(props: ContractorProfileFormProps) {
           </div>
 
           <div>
-            <label htmlFor="businessLicense" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="businessLicense"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Business License Number
             </label>
             <input
@@ -151,15 +184,21 @@ export function ContractorProfileForm(props: ContractorProfileFormProps) {
                   <input
                     type="checkbox"
                     value={service}
-                    {...register('services', { required: 'Select at least one service' })}
+                    {...register('services', {
+                      required: 'Select at least one service',
+                    })}
                     className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
-                  <span className="text-sm text-gray-700">{String(service).replace(/_/g, ' ')}</span>
+                  <span className="text-sm text-gray-700">
+                    {String(service).replace(/_/g, ' ')}
+                  </span>
                 </label>
               ))}
             </div>
             {errors.services && (
-              <p className="mt-1 text-sm text-red-600">{String(errors.services.message)}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {String(errors.services.message)}
+              </p>
             )}
           </div>
 
@@ -173,15 +212,21 @@ export function ContractorProfileForm(props: ContractorProfileFormProps) {
                   <input
                     type="checkbox"
                     value={province}
-                    {...register('serviceAreas', { required: 'Select at least one service area' })}
+                    {...register('serviceAreas', {
+                      required: 'Select at least one service area',
+                    })}
                     className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
-                  <span className="text-sm text-gray-700">{String(province).replace(/_/g, ' ')}</span>
+                  <span className="text-sm text-gray-700">
+                    {String(province).replace(/_/g, ' ')}
+                  </span>
                 </label>
               ))}
             </div>
             {errors.serviceAreas && (
-              <p className="mt-1 text-sm text-red-600">{String(errors.serviceAreas.message)}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {String(errors.serviceAreas.message)}
+              </p>
             )}
           </div>
         </div>
@@ -198,11 +243,16 @@ export function ContractorProfileForm(props: ContractorProfileFormProps) {
                 {...register('isAvailable')}
                 className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
-              <span className="text-sm text-gray-700">Currently available for new jobs</span>
+              <span className="text-sm text-gray-700">
+                Currently available for new jobs
+              </span>
             </label>
 
             <div>
-              <label htmlFor="maxConcurrentJobs" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="maxConcurrentJobs"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Maximum Concurrent Jobs
               </label>
               <input
@@ -221,7 +271,9 @@ export function ContractorProfileForm(props: ContractorProfileFormProps) {
                 {...register('prefersCatalogJobs')}
                 className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
-              <span className="text-sm text-gray-700">Prefer jobs from contractor catalog</span>
+              <span className="text-sm text-gray-700">
+                Prefer jobs from contractor catalog
+              </span>
             </label>
           </div>
         </div>
@@ -233,7 +285,11 @@ export function ContractorProfileForm(props: ContractorProfileFormProps) {
           disabled={isLoading}
           className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          {isLoading ? 'Saving...' : isCreate ? 'Create Profile' : 'Save Changes'}
+          {isLoading
+            ? 'Saving...'
+            : isCreate
+              ? 'Create Profile'
+              : 'Save Changes'}
         </button>
       </div>
     </form>

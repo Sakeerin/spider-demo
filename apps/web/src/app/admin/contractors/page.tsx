@@ -31,7 +31,11 @@ export default function AdminContractorsPage() {
     }
   };
 
-  const handleApprove = async (id: string, isApproved: boolean, verification: VerificationStatus) => {
+  const handleApprove = async (
+    id: string,
+    isApproved: boolean,
+    verification: VerificationStatus
+  ) => {
     await contractorsApi.approve(token!, id, isApproved, verification);
     await loadPendingApprovals();
   };

@@ -29,14 +29,14 @@
   - Build profile management UI components for all user types
   - _Requirements: 4.1, 4.2, 8.3_
 
-- [ ] 5. Implement lead capture and management system
+- [x] 5. Implement lead capture and management system
   - Create lead submission forms with validation for all service types
   - Build lead processing API with email/SMS confirmation
   - Implement lead assignment and queuing system for coordinators
   - Create lead management dashboard for back-office users
   - _Requirements: 2.1, 6.1, 7.1_
 
-- [ ] 6. Build Random Match engine and contractor matching
+- [x] 6. Build Random Match engine and contractor matching
   - Implement matching algorithm with service type, location, and rating scoring
   - Create contractor availability checking and workload balancing
   - Build match generation API with coordinator override capabilities

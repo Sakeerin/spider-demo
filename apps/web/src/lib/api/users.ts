@@ -1,4 +1,9 @@
-import { IUser, IUserProfile, UpdateUserDto, UpdateUserProfileDto } from '@spider/shared/types/user';
+import {
+  IUser,
+  IUserProfile,
+  UpdateUserDto,
+  UpdateUserProfileDto,
+} from '@spider/shared/types/user';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -34,7 +39,10 @@ export const usersApi = {
     return response.json();
   },
 
-  async updateProfile(token: string, data: UpdateUserProfileDto): Promise<IUserProfile> {
+  async updateProfile(
+    token: string,
+    data: UpdateUserProfileDto
+  ): Promise<IUserProfile> {
     const response = await fetch(`${API_URL}/users/me/profile`, {
       method: 'PATCH',
       headers: {
@@ -51,7 +59,11 @@ export const usersApi = {
     return response.json();
   },
 
-  async changePassword(token: string, currentPassword: string, newPassword: string): Promise<{ message: string }> {
+  async changePassword(
+    token: string,
+    currentPassword: string,
+    newPassword: string
+  ): Promise<{ message: string }> {
     const response = await fetch(`${API_URL}/users/me/change-password`, {
       method: 'POST',
       headers: {
@@ -97,7 +109,11 @@ export const usersApi = {
     return response.json();
   },
 
-  async updateUserRole(token: string, userId: string, role: string): Promise<IUser> {
+  async updateUserRole(
+    token: string,
+    userId: string,
+    role: string
+  ): Promise<IUser> {
     const response = await fetch(`${API_URL}/users/${userId}/role`, {
       method: 'PATCH',
       headers: {
@@ -114,7 +130,10 @@ export const usersApi = {
     return response.json();
   },
 
-  async deleteUser(token: string, userId: string): Promise<{ message: string }> {
+  async deleteUser(
+    token: string,
+    userId: string
+  ): Promise<{ message: string }> {
     const response = await fetch(`${API_URL}/users/${userId}`, {
       method: 'DELETE',
       headers: {

@@ -8,7 +8,11 @@ import { ContractorProfileForm } from '@/components/profile/contractor-profile-f
 import { PortfolioManager } from '@/components/profile/portfolio-manager';
 import { UserProfileForm } from '@/components/profile/user-profile-form';
 import { UpdateUserDto } from '@spider/shared/types/user';
-import { UpdateContractorDto, CreatePortfolioItemDto, UpdatePortfolioItemDto } from '@spider/shared/types/contractor';
+import {
+  UpdateContractorDto,
+  CreatePortfolioItemDto,
+  UpdatePortfolioItemDto,
+} from '@spider/shared/types/contractor';
 
 export default function ContractorProfilePage() {
   const { user } = useAuth();
@@ -17,7 +21,9 @@ export default function ContractorProfilePage() {
   const [contractorData, setContractorData] = useState<any>(null);
   const [hasContractorProfile, setHasContractorProfile] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'user' | 'contractor' | 'portfolio'>('user');
+  const [activeTab, setActiveTab] = useState<
+    'user' | 'contractor' | 'portfolio'
+  >('user');
 
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
@@ -67,7 +73,10 @@ export default function ContractorProfilePage() {
     await loadData();
   };
 
-  const handleUpdatePortfolio = async (id: string, data: UpdatePortfolioItemDto) => {
+  const handleUpdatePortfolio = async (
+    id: string,
+    data: UpdatePortfolioItemDto
+  ) => {
     await contractorsApi.updatePortfolioItem(token!, id, data);
     await loadData();
   };
@@ -101,7 +110,8 @@ export default function ContractorProfilePage() {
         {!hasContractorProfile && (
           <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
             <p className="text-yellow-800">
-              You don't have a contractor profile yet. Create one to start receiving job opportunities.
+              You don&apos;t have a contractor profile yet. Create one to start
+              receiving job opportunities.
             </p>
           </div>
         )}

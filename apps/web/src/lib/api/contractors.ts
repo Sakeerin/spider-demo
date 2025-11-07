@@ -15,7 +15,10 @@ import {
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 export const contractorsApi = {
-  async create(token: string, data: Omit<CreateContractorDto, 'userId'>): Promise<IContractor> {
+  async create(
+    token: string,
+    data: Omit<CreateContractorDto, 'userId'>
+  ): Promise<IContractor> {
     const response = await fetch(`${API_URL}/contractors`, {
       method: 'POST',
       headers: {
@@ -46,7 +49,10 @@ export const contractorsApi = {
     return response.json();
   },
 
-  async updateMe(token: string, data: UpdateContractorDto): Promise<IContractor> {
+  async updateMe(
+    token: string,
+    data: UpdateContractorDto
+  ): Promise<IContractor> {
     const response = await fetch(`${API_URL}/contractors/me`, {
       method: 'PATCH',
       headers: {
@@ -69,7 +75,7 @@ export const contractorsApi = {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
           if (Array.isArray(value)) {
-            value.forEach(v => params.append(key, v.toString()));
+            value.forEach((v) => params.append(key, v.toString()));
           } else {
             params.append(key, value.toString());
           }
@@ -77,7 +83,9 @@ export const contractorsApi = {
       });
     }
 
-    const url = params.toString() ? `${API_URL}/contractors?${params}` : `${API_URL}/contractors`;
+    const url = params.toString()
+      ? `${API_URL}/contractors?${params}`
+      : `${API_URL}/contractors`;
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -111,7 +119,12 @@ export const contractorsApi = {
     return response.json();
   },
 
-  async approve(token: string, id: string, isApproved: boolean, verification: string): Promise<IContractor> {
+  async approve(
+    token: string,
+    id: string,
+    isApproved: boolean,
+    verification: string
+  ): Promise<IContractor> {
     const response = await fetch(`${API_URL}/contractors/${id}/approve`, {
       method: 'PATCH',
       headers: {
@@ -129,7 +142,10 @@ export const contractorsApi = {
   },
 
   // Portfolio management
-  async createPortfolioItem(token: string, data: CreatePortfolioItemDto): Promise<IPortfolioItem> {
+  async createPortfolioItem(
+    token: string,
+    data: CreatePortfolioItemDto
+  ): Promise<IPortfolioItem> {
     const response = await fetch(`${API_URL}/contractors/me/portfolio`, {
       method: 'POST',
       headers: {
@@ -146,7 +162,11 @@ export const contractorsApi = {
     return response.json();
   },
 
-  async updatePortfolioItem(token: string, id: string, data: UpdatePortfolioItemDto): Promise<IPortfolioItem> {
+  async updatePortfolioItem(
+    token: string,
+    id: string,
+    data: UpdatePortfolioItemDto
+  ): Promise<IPortfolioItem> {
     const response = await fetch(`${API_URL}/contractors/portfolio/${id}`, {
       method: 'PATCH',
       headers: {
@@ -163,7 +183,10 @@ export const contractorsApi = {
     return response.json();
   },
 
-  async deletePortfolioItem(token: string, id: string): Promise<{ message: string }> {
+  async deletePortfolioItem(
+    token: string,
+    id: string
+  ): Promise<{ message: string }> {
     const response = await fetch(`${API_URL}/contractors/portfolio/${id}`, {
       method: 'DELETE',
       headers: {
@@ -179,7 +202,10 @@ export const contractorsApi = {
   },
 
   // Availability management
-  async createAvailability(token: string, data: CreateAvailabilityDto): Promise<IAvailability> {
+  async createAvailability(
+    token: string,
+    data: CreateAvailabilityDto
+  ): Promise<IAvailability> {
     const response = await fetch(`${API_URL}/contractors/me/availability`, {
       method: 'POST',
       headers: {
@@ -196,7 +222,11 @@ export const contractorsApi = {
     return response.json();
   },
 
-  async updateAvailability(token: string, id: string, data: UpdateAvailabilityDto): Promise<IAvailability> {
+  async updateAvailability(
+    token: string,
+    id: string,
+    data: UpdateAvailabilityDto
+  ): Promise<IAvailability> {
     const response = await fetch(`${API_URL}/contractors/availability/${id}`, {
       method: 'PATCH',
       headers: {
@@ -213,7 +243,10 @@ export const contractorsApi = {
     return response.json();
   },
 
-  async deleteAvailability(token: string, id: string): Promise<{ message: string }> {
+  async deleteAvailability(
+    token: string,
+    id: string
+  ): Promise<{ message: string }> {
     const response = await fetch(`${API_URL}/contractors/availability/${id}`, {
       method: 'DELETE',
       headers: {
