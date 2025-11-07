@@ -49,6 +49,25 @@ export interface IDocument {
 export interface IJobWithDetails extends IJob {
   milestones: IMilestone[];
   documents: IDocument[];
+  contractor?: {
+    id: string;
+    businessName: string;
+    user: {
+      id: string;
+      email: string;
+      firstName?: string;
+      lastName?: string;
+      avatar?: string;
+    };
+  };
+  customer?: {
+    id: string;
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    avatar?: string;
+  };
+  lead?: any;
 }
 
 // Job creation and update DTOs
@@ -83,8 +102,6 @@ export interface CreateQuoteDto {
 
 export interface ApproveQuoteDto {
   jobId: string;
-  approved: boolean;
-  notes?: string;
 }
 
 // Milestone DTOs
@@ -92,7 +109,7 @@ export interface CreateMilestoneDto {
   title: string;
   description?: string;
   amount: number;
-  dueDate: Date;
+  dueDate: string;
 }
 
 export interface UpdateMilestoneDto {
