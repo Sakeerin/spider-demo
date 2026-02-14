@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import {
   GenerateMatchDto,
@@ -8,16 +12,26 @@ import {
   MatchResult,
 } from './dto/matching.dto';
 import { ServiceType, Province, UrgencyLevel } from '@prisma/client';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class MatchingService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationsService: NotificationsService
+  ) {}
 
   /**
    * Generate contractor matches for a lead using the Random Match algorithm
    */
-  async generateMatches(generateMatchDto: GenerateMatchDto): Promise<MatchResult> {
-    const { leadId, maxMatches = 3, excludeContractorIds = [] } = generateMatchDto;
+  async generateMatches(
+    generateMatchDto: GenerateMatchDto
+  ): Promise<MatchResult> {
+    const {
+      leadId,
+      maxMatches = 3,
+      excludeContractorIds = [],
+    } = generateMatchDto;
 
     // Fetch the lead with customer details
     const lead = await this.prisma.lead.findUnique({
@@ -43,7 +57,10 @@ export class MatchingService {
     };
 
     // Get eligible contractors
-    const eligibleContractors = await this.getEligibleContractors(criteria, excludeContractorIds);
+    const eligibleContractors = await this.getEligibleContractors(
+      criteria,
+      excludeContractorIds
+    );
 
     if (eligibleContractors.length === 0) {
       return {
@@ -56,7 +73,10 @@ export class MatchingService {
     }
 
     // Score and rank contractors
-    const scoredContractors = await this.scoreContractors(eligibleContractors, criteria);
+    const scoredContractors = await this.scoreContractors(
+      eligibleContractors,
+      criteria
+    );
 
     // Sort by score descending and take top matches
     const topMatches = scoredContractors
@@ -64,7 +84,10 @@ export class MatchingService {
       .slice(0, maxMatches);
 
     // Calculate confidence based on match quality
-    const confidence = this.calculateConfidence(topMatches, scoredContractors.length);
+    const confidence = this.calculateConfidence(
+      topMatches,
+      scoredContractors.length
+    );
 
     return {
       leadId,
@@ -129,7 +152,10 @@ export class MatchingService {
   ): Promise<ContractorMatch[]> {
     return contractors.map((contractor) => {
       const scores = {
-        rating: this.scoreRating(contractor.averageRating, contractor.totalReviews),
+        rating: this.scoreRating(
+          contractor.averageRating,
+          contractor.totalReviews
+        ),
         experience: this.scoreExperience(contractor.experience),
         successRate: this.scoreSuccessRate(contractor.successRate),
         responseTime: this.scoreResponseTime(contractor.responseTime),
@@ -142,10 +168,10 @@ export class MatchingService {
 
       // Weighted scoring
       const weights = {
-        rating: 0.30,
+        rating: 0.3,
         experience: 0.15,
         successRate: 0.25,
-        responseTime: 0.10,
+        responseTime: 0.1,
         workload: 0.15,
         budget: 0.05,
       };
@@ -184,13 +210,13 @@ export class MatchingService {
    */
   private scoreRating(rating: number, reviewCount: number): number {
     if (reviewCount === 0) return 0.5; // Neutral score for new contractors
-    
+
     // Normalize rating (0-5 scale to 0-1)
     const normalizedRating = rating / 5;
-    
+
     // Apply confidence factor based on review count
     const confidenceFactor = Math.min(reviewCount / 20, 1); // Full confidence at 20+ reviews
-    
+
     return normalizedRating * (0.7 + 0.3 * confidenceFactor);
   }
 
@@ -214,7 +240,7 @@ export class MatchingService {
    */
   private scoreResponseTime(minutes: number): number {
     if (minutes === 0) return 0.5; // No data yet
-    
+
     // Excellent: < 60 min, Good: < 180 min, Fair: < 360 min
     if (minutes < 60) return 1.0;
     if (minutes < 180) return 0.8;
@@ -249,7 +275,9 @@ export class MatchingService {
     const reasons: string[] = [];
 
     if (scores.rating > 0.8) {
-      reasons.push(`Highly rated (${contractor.averageRating.toFixed(1)}/5.0 from ${contractor.totalReviews} reviews)`);
+      reasons.push(
+        `Highly rated (${contractor.averageRating.toFixed(1)}/5.0 from ${contractor.totalReviews} reviews)`
+      );
     } else if (scores.rating > 0.6) {
       reasons.push(`Good rating (${contractor.averageRating.toFixed(1)}/5.0)`);
     }
@@ -282,13 +310,16 @@ export class MatchingService {
   /**
    * Calculate overall confidence in the match results
    */
-  private calculateConfidence(matches: ContractorMatch[], totalCandidates: number): number {
+  private calculateConfidence(
+    matches: ContractorMatch[],
+    totalCandidates: number
+  ): number {
     if (matches.length === 0) return 0;
 
     // Base confidence on top match score and candidate pool size
     const topScore = matches[0].score;
     const poolFactor = Math.min(totalCandidates / 10, 1); // Full confidence with 10+ candidates
-    
+
     return Math.round((topScore * 0.7 + poolFactor * 0.3) * 100);
   }
 
@@ -316,7 +347,9 @@ export class MatchingService {
     });
 
     if (contractors.length !== contractorIds.length) {
-      throw new BadRequestException('One or more contractors are not available');
+      throw new BadRequestException(
+        'One or more contractors are not available'
+      );
     }
 
     // Create lead assignments
@@ -353,8 +386,27 @@ export class MatchingService {
       data: { status: 'ASSIGNED' },
     });
 
-    // TODO: Log the override action in audit log
-    // TODO: Send notifications to assigned contractors
+    await Promise.all(
+      assignments.map((assignment) =>
+        this.notificationsService.sendTemplateNotification({
+          template: 'lead_assigned_contractor',
+          userId: contractors.find(
+            (contractor) => contractor.id === assignment.contractorId
+          )!.userId,
+          variables: {
+            leadId,
+            serviceType: lead.serviceType,
+            city: lead.city,
+            deadline: new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleString(
+              'en-US',
+              {
+                timeZone: 'Asia/Bangkok',
+              }
+            ),
+          },
+        })
+      )
+    );
 
     return {
       lead: await this.prisma.lead.findUnique({
@@ -375,7 +427,11 @@ export class MatchingService {
   /**
    * Handle contractor response to lead assignment
    */
-  async handleContractorResponse(leadAssignmentId: string, response: 'ACCEPTED' | 'DECLINED', declineReason?: string) {
+  async handleContractorResponse(
+    leadAssignmentId: string,
+    response: 'ACCEPTED' | 'DECLINED',
+    declineReason?: string
+  ) {
     const assignment = await this.prisma.leadAssignment.findUnique({
       where: { id: leadAssignmentId },
       include: {
@@ -385,11 +441,15 @@ export class MatchingService {
     });
 
     if (!assignment) {
-      throw new NotFoundException(`Lead assignment with ID ${leadAssignmentId} not found`);
+      throw new NotFoundException(
+        `Lead assignment with ID ${leadAssignmentId} not found`
+      );
     }
 
     if (assignment.response) {
-      throw new BadRequestException('This lead assignment has already been responded to');
+      throw new BadRequestException(
+        'This lead assignment has already been responded to'
+      );
     }
 
     // Update the assignment
@@ -408,13 +468,25 @@ export class MatchingService {
 
     // Handle acceptance
     if (response === 'ACCEPTED') {
-      // TODO: Notify customer about acceptance
-      // TODO: Update other assignments for this lead to NO_RESPONSE if not responded
+      await this.notificationsService.sendTemplateNotification({
+        template: 'contractor_response_customer',
+        userId: assignment.lead.customerId,
+        variables: {
+          leadId: assignment.leadId,
+          contractorName: assignment.contractor.businessName,
+          response: 'accepted',
+          declineReasonText: '',
+        },
+      });
     }
 
     // Handle decline - trigger reassignment
     if (response === 'DECLINED') {
-      await this.handleDeclinedMatch(assignment.leadId, assignment.contractorId, declineReason);
+      await this.handleDeclinedMatch(
+        assignment.leadId,
+        assignment.contractorId,
+        declineReason
+      );
     }
 
     return updatedAssignment;
@@ -423,7 +495,16 @@ export class MatchingService {
   /**
    * Handle declined match and trigger reassignment
    */
-  private async handleDeclinedMatch(leadId: string, declinedContractorId: string, reason?: string) {
+  private async handleDeclinedMatch(
+    leadId: string,
+    declinedContractorId: string,
+    reason?: string
+  ) {
+    const lead = await this.prisma.lead.findUnique({
+      where: { id: leadId },
+      select: { serviceType: true },
+    });
+
     // Get all assignments for this lead
     const allAssignments = await this.prisma.leadAssignment.findMany({
       where: { leadId },
@@ -437,7 +518,7 @@ export class MatchingService {
     if (allDeclined) {
       // All contractors declined - need to find new matches
       const excludeIds = allAssignments.map((a) => a.contractorId);
-      
+
       const newMatches = await this.generateMatches({
         leadId,
         maxMatches: 3,
@@ -447,7 +528,7 @@ export class MatchingService {
       if (newMatches.matches.length > 0) {
         // Auto-assign new matches
         const newContractorIds = newMatches.matches.map((m) => m.contractorId);
-        
+
         await Promise.all(
           newContractorIds.map((contractorId) =>
             this.prisma.leadAssignment.create({
@@ -459,8 +540,23 @@ export class MatchingService {
           )
         );
 
-        // TODO: Send notifications to new contractors
-        // TODO: Notify coordinator about reassignment
+        const newContractors = await this.prisma.contractor.findMany({
+          where: { id: { in: newContractorIds } },
+          select: { userId: true },
+        });
+
+        await Promise.all(
+          newContractors.map((contractor) =>
+            this.notificationsService.sendTemplateNotification({
+              template: 'reassignment_broadcast_contractor',
+              userId: contractor.userId,
+              variables: {
+                leadId,
+                serviceType: lead?.serviceType || 'SERVICE',
+              },
+            })
+          )
+        );
       } else {
         // No more matches available - notify coordinator
         // TODO: Create notification for coordinator to manually handle
@@ -477,7 +573,11 @@ export class MatchingService {
   /**
    * Check contractor availability for a specific time period
    */
-  async checkContractorAvailability(contractorId: string, startDate?: Date, endDate?: Date) {
+  async checkContractorAvailability(
+    contractorId: string,
+    startDate?: Date,
+    endDate?: Date
+  ) {
     const contractor = await this.prisma.contractor.findUnique({
       where: { id: contractorId },
       include: {
@@ -493,7 +593,9 @@ export class MatchingService {
     });
 
     if (!contractor) {
-      throw new NotFoundException(`Contractor with ID ${contractorId} not found`);
+      throw new NotFoundException(
+        `Contractor with ID ${contractorId} not found`
+      );
     }
 
     const currentJobs = contractor.contractorJobs.length;
@@ -528,12 +630,15 @@ export class MatchingService {
     });
 
     if (!contractor) {
-      throw new NotFoundException(`Contractor with ID ${contractorId} not found`);
+      throw new NotFoundException(
+        `Contractor with ID ${contractorId} not found`
+      );
     }
 
     const activeJobs = contractor.contractorJobs.length;
     const pendingMilestones = contractor.contractorJobs.reduce(
-      (sum, job) => sum + job.milestones.filter((m) => m.status === 'PENDING').length,
+      (sum, job) =>
+        sum + job.milestones.filter((m) => m.status === 'PENDING').length,
       0
     );
 
@@ -543,7 +648,8 @@ export class MatchingService {
       maxJobs: contractor.maxConcurrentJobs,
       utilizationRate: (activeJobs / contractor.maxConcurrentJobs) * 100,
       pendingMilestones,
-      isAvailable: contractor.isAvailable && activeJobs < contractor.maxConcurrentJobs,
+      isAvailable:
+        contractor.isAvailable && activeJobs < contractor.maxConcurrentJobs,
     };
   }
 }

@@ -10,6 +10,7 @@ import { ContractorsModule } from './modules/contractors/contractors.module';
 import { LeadsModule } from './modules/leads/leads.module';
 import { MatchingModule } from './modules/matching/matching.module';
 import { JobsModule } from './modules/jobs/jobs.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
 
 @Module({
@@ -24,6 +25,7 @@ import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
     LeadsModule,
     MatchingModule,
     JobsModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [

@@ -1,11 +1,25 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { CreateLeadDto, UpdateLeadDto, AssignLeadDto, RespondToLeadDto, LeadSearchDto } from './dto/lead.dto';
+import {
+  CreateLeadDto,
+  UpdateLeadDto,
+  AssignLeadDto,
+  RespondToLeadDto,
+  LeadSearchDto,
+} from './dto/lead.dto';
 import { LeadStatus, Prisma } from '@prisma/client';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class LeadsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationsService: NotificationsService
+  ) {}
 
   async create(createLeadDto: CreateLeadDto) {
     const lead = await this.prisma.lead.create({
@@ -27,8 +41,14 @@ export class LeadsService {
       },
     });
 
-    // TODO: Send confirmation notification (email/SMS/LINE)
-    // This will be implemented in the notification system task
+    await this.notificationsService.sendTemplateNotification({
+      template: 'lead_submitted_customer',
+      userId: lead.customerId,
+      variables: {
+        leadId: lead.id,
+        serviceType: lead.serviceType,
+      },
+    });
 
     return lead;
   }
@@ -239,7 +259,9 @@ export class LeadsService {
     });
 
     if (contractors.length !== contractorIds.length) {
-      throw new BadRequestException('One or more contractors are not available');
+      throw new BadRequestException(
+        'One or more contractors are not available'
+      );
     }
 
     // Create lead assignments
@@ -267,8 +289,27 @@ export class LeadsService {
       data: { status: 'ASSIGNED' },
     });
 
-    // TODO: Send notifications to assigned contractors
-    // This will be implemented in the notification system task
+    await Promise.all(
+      assignments.map((assignment) =>
+        this.notificationsService.sendTemplateNotification({
+          template: 'lead_assigned_contractor',
+          userId: contractors.find(
+            (contractor) => contractor.id === assignment.contractorId
+          )!.userId,
+          variables: {
+            leadId,
+            serviceType: lead.serviceType,
+            city: lead.city,
+            deadline: new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleString(
+              'en-US',
+              {
+                timeZone: 'Asia/Bangkok',
+              }
+            ),
+          },
+        })
+      )
+    );
 
     return {
       lead: await this.findOne(leadId),
@@ -288,11 +329,15 @@ export class LeadsService {
     });
 
     if (!assignment) {
-      throw new NotFoundException(`Lead assignment with ID ${leadAssignmentId} not found`);
+      throw new NotFoundException(
+        `Lead assignment with ID ${leadAssignmentId} not found`
+      );
     }
 
     if (assignment.response) {
-      throw new BadRequestException('This lead assignment has already been responded to');
+      throw new BadRequestException(
+        'This lead assignment has already been responded to'
+      );
     }
 
     const updatedAssignment = await this.prisma.leadAssignment.update({
@@ -304,9 +349,19 @@ export class LeadsService {
       },
     });
 
-    // TODO: Send notification to customer about contractor response
-    // TODO: If declined, trigger reassignment logic
-    // These will be implemented in the notification and matching system tasks
+    await this.notificationsService.sendTemplateNotification({
+      template: 'contractor_response_customer',
+      userId: assignment.lead.customerId,
+      variables: {
+        leadId: assignment.leadId,
+        contractorName: assignment.contractor.businessName,
+        response: response.toLowerCase(),
+        declineReasonText:
+          response === 'DECLINED' && declineReason
+            ? ` (reason: ${declineReason})`
+            : '',
+      },
+    });
 
     return updatedAssignment;
   }
@@ -413,10 +468,7 @@ export class LeadsService {
           },
         },
       },
-      orderBy: [
-        { urgency: 'desc' },
-        { createdAt: 'asc' },
-      ],
+      orderBy: [{ urgency: 'desc' }, { createdAt: 'asc' }],
     });
   }
 

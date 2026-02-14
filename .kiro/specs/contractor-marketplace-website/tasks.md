@@ -51,11 +51,11 @@
   - Create milestone update API with notification triggers
   - _Requirements: 3.1, 7.2, 7.3_
 
-- [ ] 8. Build notification system with multi-channel support
-  - Implement email notification service with template system
-  - Integrate LINE Official Account API for real-time notifications
-  - Create in-app notification system with real-time updates
-  - Build notification preference management for users
+- [x] 8. Build notification system with multi-channel support
+  - [x] Implement email notification service with template system
+  - [x] Integrate LINE Official Account API for real-time notifications
+  - [x] Create in-app notification system with real-time updates
+  - [x] Build notification preference management for users
   - _Requirements: 3.2, 11.1, 11.2, 11.3, 11.4_
 
 - [ ] 9. Create public website pages and content management

@@ -1,11 +1,28 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { CreateQuoteDto, ApproveQuoteDto, UpdateMilestoneStatusDto, CompleteMilestoneDto } from './dto/quote.dto';
-import { JobStatus, MilestoneStatus } from '@prisma/client';
+import {
+  CreateQuoteDto,
+  ApproveQuoteDto,
+  UpdateMilestoneStatusDto,
+  CompleteMilestoneDto,
+} from './dto/quote.dto';
+import {
+  JobStatus,
+  MilestoneStatus,
+  NotificationChannel,
+} from '@prisma/client';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class JobsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationsService: NotificationsService
+  ) {}
 
   async createQuote(createQuoteDto: CreateQuoteDto, userId: string) {
     const { jobId, amount, document, milestones } = createQuoteDto;
@@ -21,9 +38,14 @@ export class JobsService {
     }
 
     // Verify total milestone amounts match quote amount
-    const totalMilestoneAmount = milestones.reduce((sum, m) => sum + m.amount, 0);
+    const totalMilestoneAmount = milestones.reduce(
+      (sum, m) => sum + m.amount,
+      0
+    );
     if (Math.abs(totalMilestoneAmount - amount) > 0.01) {
-      throw new BadRequestException('Milestone amounts must sum to quote amount');
+      throw new BadRequestException(
+        'Milestone amounts must sum to quote amount'
+      );
     }
 
     // Update job with quote information
@@ -115,10 +137,32 @@ export class JobsService {
       },
     });
 
+    await this.notificationsService.sendNotification({
+      userIds: [updatedJob.customerId],
+      channels: [
+        NotificationChannel.EMAIL,
+        NotificationChannel.LINE,
+        NotificationChannel.IN_APP,
+      ],
+      title: 'Quote approved and project started',
+      message: `Your quote for job ${jobId} has been approved and work is now in progress.`,
+      data: {
+        jobId,
+      },
+    });
+
     return this.getJobWithDetails(jobId);
   }
 
-  async createMilestonesFromQuote(jobId: string, milestones: Array<{ title: string; description?: string; amount: number; dueDate: string }>) {
+  async createMilestonesFromQuote(
+    jobId: string,
+    milestones: Array<{
+      title: string;
+      description?: string;
+      amount: number;
+      dueDate: string;
+    }>
+  ) {
     // Verify job exists and quote is approved
     const job = await this.prisma.job.findUnique({
       where: { id: jobId },
@@ -129,7 +173,9 @@ export class JobsService {
     }
 
     if (!job.quoteApprovedAt) {
-      throw new BadRequestException('Quote must be approved before creating milestones');
+      throw new BadRequestException(
+        'Quote must be approved before creating milestones'
+      );
     }
 
     // Create milestones
@@ -151,7 +197,11 @@ export class JobsService {
     return createdMilestones;
   }
 
-  async updateMilestoneStatus(milestoneId: string, updateDto: UpdateMilestoneStatusDto, userId: string) {
+  async updateMilestoneStatus(
+    milestoneId: string,
+    updateDto: UpdateMilestoneStatusDto,
+    userId: string
+  ) {
     const { status, notes } = updateDto;
 
     // Verify milestone exists
@@ -191,10 +241,24 @@ export class JobsService {
     // Check if all milestones are completed to update job status
     await this.checkAndUpdateJobStatus(milestone.jobId);
 
+    await this.notificationsService.sendTemplateNotification({
+      template: 'milestone_status_updated',
+      userId: milestone.job.customerId,
+      variables: {
+        milestoneTitle: milestone.title,
+        status,
+        jobId: milestone.jobId,
+      },
+    });
+
     return updatedMilestone;
   }
 
-  async completeMilestone(milestoneId: string, completeDto: CompleteMilestoneDto, userId: string) {
+  async completeMilestone(
+    milestoneId: string,
+    completeDto: CompleteMilestoneDto,
+    userId: string
+  ) {
     return this.updateMilestoneStatus(
       milestoneId,
       { status: 'COMPLETED', notes: completeDto.notes },
@@ -288,7 +352,10 @@ export class JobsService {
     });
   }
 
-  private validateStatusProgression(currentStatus: MilestoneStatus, newStatus: MilestoneStatus) {
+  private validateStatusProgression(
+    currentStatus: MilestoneStatus,
+    newStatus: MilestoneStatus
+  ) {
     const validTransitions: Record<MilestoneStatus, MilestoneStatus[]> = {
       PENDING: [MilestoneStatus.IN_PROGRESS],
       IN_PROGRESS: [MilestoneStatus.REVIEW, MilestoneStatus.PENDING],
@@ -310,7 +377,9 @@ export class JobsService {
     });
 
     const allCompleted = milestones.every(
-      (m) => m.status === MilestoneStatus.COMPLETED || m.status === MilestoneStatus.PAID
+      (m) =>
+        m.status === MilestoneStatus.COMPLETED ||
+        m.status === MilestoneStatus.PAID
     );
 
     if (allCompleted && milestones.length > 0) {
