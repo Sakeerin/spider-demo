@@ -1,13 +1,22 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Manrope } from 'next/font/google';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
+const manrope = Manrope({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'SPIDER - Contractor Marketplace',
+  title: {
+    default: 'SPIDER | Verified Contractor Marketplace',
+    template: '%s | SPIDER',
+  },
   description:
-    'Connect with verified contractors for construction, renovation, and smart home services',
+    'Find verified contractors for construction, renovation, and smart home projects with transparent milestone tracking.',
+  openGraph: {
+    title: 'SPIDER Contractor Marketplace',
+    description:
+      'Discover services, compare verified contractors, and launch projects with confidence.',
+    type: 'website',
+  },
 };
 
 export default function RootLayout({
@@ -17,7 +26,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={manrope.className}>{children}</body>
     </html>
   );
 }
