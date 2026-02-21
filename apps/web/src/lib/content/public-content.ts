@@ -14,12 +14,39 @@ export interface ServiceContent {
 export interface ContractorPreview {
   id: string;
   name: string;
+  headline: string;
   serviceSlugs: string[];
   city: string;
   rating: number;
   reviews: number;
   verified: boolean;
   responseTimeHours: number;
+  budgetMin: number;
+  budgetMax: number;
+  yearsExperience: number;
+  successRate: number;
+  completedProjects: number;
+  trustSignals: string[];
+  portfolio: ContractorPortfolioItem[];
+  testimonials: ContractorReview[];
+}
+
+export interface ContractorPortfolioItem {
+  id: string;
+  title: string;
+  summary: string;
+  serviceSlug: string;
+  location: string;
+  completedAt: string;
+  budgetLabel: string;
+}
+
+export interface ContractorReview {
+  id: string;
+  author: string;
+  rating: number;
+  projectType: string;
+  comment: string;
 }
 
 export interface ProductContent {
@@ -119,42 +146,249 @@ const fallbackContent: PublicContentBundle = {
     {
       id: 'ctr-1',
       name: 'MetroBuild Partners',
+      headline: 'Residential and mixed-use construction teams with strict QA.',
       serviceSlugs: ['construction', 'renovation'],
       city: 'Bangkok',
       rating: 4.9,
       reviews: 124,
       verified: true,
       responseTimeHours: 2,
+      budgetMin: 350000,
+      budgetMax: 2500000,
+      yearsExperience: 14,
+      successRate: 97,
+      completedProjects: 318,
+      trustSignals: [
+        'Verified business license',
+        '97% on-time delivery',
+        'Dedicated site supervisor',
+      ],
+      portfolio: [
+        {
+          id: 'ctr-1-port-1',
+          title: 'Three-story townhouse construction',
+          summary:
+            'Turnkey build from structural works to handover with weekly milestone reports.',
+          serviceSlug: 'construction',
+          location: 'Bang Na, Bangkok',
+          completedAt: '2025-11',
+          budgetLabel: 'THB 2.4M',
+        },
+        {
+          id: 'ctr-1-port-2',
+          title: 'Office floor renovation for fintech team',
+          summary:
+            'Night-shift remodeling plan to avoid business downtime during weekdays.',
+          serviceSlug: 'renovation',
+          location: 'Sathorn, Bangkok',
+          completedAt: '2025-08',
+          budgetLabel: 'THB 980K',
+        },
+      ],
+      testimonials: [
+        {
+          id: 'ctr-1-rev-1',
+          author: 'Pattra S.',
+          rating: 5,
+          projectType: 'Townhouse construction',
+          comment:
+            'Clear progress updates every week and very practical recommendations on materials.',
+        },
+        {
+          id: 'ctr-1-rev-2',
+          author: 'Akarin T.',
+          rating: 4.8,
+          projectType: 'Commercial renovation',
+          comment:
+            'Strong planning and site safety. We finished before the retail relaunch date.',
+        },
+      ],
     },
     {
       id: 'ctr-2',
       name: 'Northline Interior Co.',
+      headline:
+        'Boutique interior remodeling specialists for homes and hospitality spaces.',
       serviceSlugs: ['renovation'],
       city: 'Chiang Mai',
       rating: 4.7,
       reviews: 82,
       verified: true,
       responseTimeHours: 4,
+      budgetMin: 120000,
+      budgetMax: 900000,
+      yearsExperience: 9,
+      successRate: 94,
+      completedProjects: 204,
+      trustSignals: [
+        'Verified by SPIDER quality team',
+        'Interior-focused crew',
+        'High communication score',
+      ],
+      portfolio: [
+        {
+          id: 'ctr-2-port-1',
+          title: 'Cafe interior refresh and seating expansion',
+          summary:
+            'Custom millwork and lighting upgrade completed in two coordinated phases.',
+          serviceSlug: 'renovation',
+          location: 'Nimman, Chiang Mai',
+          completedAt: '2025-10',
+          budgetLabel: 'THB 460K',
+        },
+        {
+          id: 'ctr-2-port-2',
+          title: 'Condo kitchen and bathroom remodel',
+          summary:
+            'Moisture-resistant materials with optimized storage for compact layouts.',
+          serviceSlug: 'renovation',
+          location: 'Muang Chiang Mai',
+          completedAt: '2025-07',
+          budgetLabel: 'THB 310K',
+        },
+      ],
+      testimonials: [
+        {
+          id: 'ctr-2-rev-1',
+          author: 'Naphat K.',
+          rating: 4.9,
+          projectType: 'Condo renovation',
+          comment:
+            'Their design suggestions made the space feel much larger without going over budget.',
+        },
+        {
+          id: 'ctr-2-rev-2',
+          author: 'Lada P.',
+          rating: 4.7,
+          projectType: 'Cafe remodeling',
+          comment:
+            'Very responsive team and clear daily updates from their site lead.',
+        },
+      ],
     },
     {
       id: 'ctr-3',
       name: 'SmartGrid Home Tech',
+      headline:
+        'Certified smart-home and energy installers with post-install support plans.',
       serviceSlugs: ['smart-home'],
       city: 'Bangkok',
       rating: 4.8,
       reviews: 146,
       verified: true,
       responseTimeHours: 3,
+      budgetMin: 70000,
+      budgetMax: 1200000,
+      yearsExperience: 11,
+      successRate: 96,
+      completedProjects: 422,
+      trustSignals: [
+        'Certified EV and solar installers',
+        '24-hour support SLA',
+        '95% first-visit completion rate',
+      ],
+      portfolio: [
+        {
+          id: 'ctr-3-port-1',
+          title: 'Smart security rollout for gated community',
+          summary:
+            'Installed access controls, CCTV, and automation routines across 28 homes.',
+          serviceSlug: 'smart-home',
+          location: 'Prawet, Bangkok',
+          completedAt: '2025-12',
+          budgetLabel: 'THB 1.1M',
+        },
+        {
+          id: 'ctr-3-port-2',
+          title: 'Condo full-stack smart automation setup',
+          summary:
+            'Voice scenes, sensor routing, and remote monitoring for frequent travelers.',
+          serviceSlug: 'smart-home',
+          location: 'Ratchada, Bangkok',
+          completedAt: '2025-09',
+          budgetLabel: 'THB 180K',
+        },
+      ],
+      testimonials: [
+        {
+          id: 'ctr-3-rev-1',
+          author: 'Kittipong R.',
+          rating: 5,
+          projectType: 'Smart security installation',
+          comment:
+            'Installation was clean and their app walkthrough made adoption very easy.',
+        },
+        {
+          id: 'ctr-3-rev-2',
+          author: 'Mali C.',
+          rating: 4.8,
+          projectType: 'Smart automation setup',
+          comment:
+            'Excellent support after handover. They tuned our routines based on real usage.',
+        },
+      ],
     },
     {
       id: 'ctr-4',
       name: 'East Bay Energy Works',
+      headline:
+        'Energy retrofits and smart upgrades for homes and small commercial sites.',
       serviceSlugs: ['smart-home', 'construction'],
       city: 'Chonburi',
       rating: 4.6,
       reviews: 64,
       verified: true,
       responseTimeHours: 6,
+      budgetMin: 90000,
+      budgetMax: 1400000,
+      yearsExperience: 8,
+      successRate: 92,
+      completedProjects: 167,
+      trustSignals: [
+        'Verified insurance coverage',
+        'Specialized in energy optimization',
+        'Strong after-sales rating',
+      ],
+      portfolio: [
+        {
+          id: 'ctr-4-port-1',
+          title: 'Warehouse lighting and EV readiness retrofit',
+          summary:
+            'Reduced operating cost with upgraded circuits and staged charger deployment.',
+          serviceSlug: 'smart-home',
+          location: 'Mueang Chonburi',
+          completedAt: '2025-06',
+          budgetLabel: 'THB 760K',
+        },
+        {
+          id: 'ctr-4-port-2',
+          title: 'Home extension with solar-ready infrastructure',
+          summary:
+            'New structural works designed for future inverter and battery expansion.',
+          serviceSlug: 'construction',
+          location: 'Sriracha, Chonburi',
+          completedAt: '2025-04',
+          budgetLabel: 'THB 1.3M',
+        },
+      ],
+      testimonials: [
+        {
+          id: 'ctr-4-rev-1',
+          author: 'Paveena J.',
+          rating: 4.7,
+          projectType: 'Home extension',
+          comment:
+            'Good coordination between civil and electrical teams. Handover checklist was thorough.',
+        },
+        {
+          id: 'ctr-4-rev-2',
+          author: 'Somchai V.',
+          rating: 4.6,
+          projectType: 'Energy retrofit',
+          comment:
+            'They explained ROI clearly and adapted the plan to our available budget range.',
+        },
+      ],
     },
   ],
   products: [
@@ -306,4 +540,14 @@ export function formatServiceLabel(slug: string): string {
     .split('-')
     .map((item) => item.charAt(0).toUpperCase() + item.slice(1))
     .join(' ');
+}
+
+export function formatBudgetRange(min: number, max: number): string {
+  const formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'THB',
+    maximumFractionDigits: 0,
+  });
+
+  return `${formatter.format(min)} - ${formatter.format(max)}`;
 }

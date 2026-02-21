@@ -68,6 +68,12 @@ export default async function Home() {
                 Explore services
               </Link>
               <Link
+                href="/contractors"
+                className="rounded-lg border border-cyan-300 bg-cyan-50 px-5 py-3 text-sm font-semibold text-cyan-800 transition hover:bg-cyan-100"
+              >
+                Browse contractors
+              </Link>
+              <Link
                 href="/products"
                 className="rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-100"
               >
